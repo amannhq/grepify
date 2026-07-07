@@ -22,8 +22,10 @@
 //! let m = ast.matches(r"def \NAME(\(A*\)):").unwrap();
 //! assert_eq!(m[0].captures["NAME"][0].text(ast.source()), "f");
 //!
-//! // Reuse the compiled pattern across many sources.
-//! let pat = CodePattern::new(r"def \NAME(\(A*\)):", "python", 3).unwrap();
+//! // Reuse the compiled pattern across many sources. The prefilter keys on
+//! // identifier terms in the pattern (here `foo`), so sources without them are
+//! // rejected without parsing.
+//! let pat = CodePattern::new(r"def foo(\(A*\)):", "python", 3).unwrap();
 //! assert!(pat.might_match("def foo(): pass"));
 //! assert!(!pat.might_match("x = 1"));
 //! # }
