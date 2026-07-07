@@ -116,8 +116,18 @@ async fn bigquery_target_creates_upserts_and_reconciles_when_available() -> Resu
     // create + 3 rows, re-run unchanged, then update one and drop one. Each
     // phase drives real DDL/DML; the test table is nonce-named so parallel /
     // repeated runs don't collide (left in the test dataset for inspection).
-    run(vec![r("a", "alpha", 1), r("b", "beta", 2), r("c", "gamma", 3)]).await;
-    run(vec![r("a", "alpha", 1), r("b", "beta", 2), r("c", "gamma", 3)]).await;
+    run(vec![
+        r("a", "alpha", 1),
+        r("b", "beta", 2),
+        r("c", "gamma", 3),
+    ])
+    .await;
+    run(vec![
+        r("a", "alpha", 1),
+        r("b", "beta", 2),
+        r("c", "gamma", 3),
+    ])
+    .await;
     run(vec![r("a", "alpha-updated", 10), r("b", "beta", 2)]).await;
 
     Ok(())

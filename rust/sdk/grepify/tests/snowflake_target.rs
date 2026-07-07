@@ -47,9 +47,15 @@ fn schema() -> TableSchema {
 
 fn try_connect() -> Option<SnowflakeConnection> {
     let (account, user, password) = (
-        std::env::var("SNOWFLAKE_ACCOUNT").ok().filter(|s| !s.is_empty())?,
-        std::env::var("SNOWFLAKE_USER").ok().filter(|s| !s.is_empty())?,
-        std::env::var("SNOWFLAKE_PASSWORD").ok().filter(|s| !s.is_empty())?,
+        std::env::var("SNOWFLAKE_ACCOUNT")
+            .ok()
+            .filter(|s| !s.is_empty())?,
+        std::env::var("SNOWFLAKE_USER")
+            .ok()
+            .filter(|s| !s.is_empty())?,
+        std::env::var("SNOWFLAKE_PASSWORD")
+            .ok()
+            .filter(|s| !s.is_empty())?,
     );
     let mut config = SnowflakeConfig::new(account, user, password);
     if let Ok(wh) = std::env::var("SNOWFLAKE_WAREHOUSE") {
@@ -138,8 +144,18 @@ async fn snowflake_target_creates_upserts_and_reconciles_when_available() -> Res
     };
 
     // create + 3 rows, re-run unchanged, then update one and drop one.
-    run(vec![r("a", "alpha", 1), r("b", "beta", 2), r("c", "gamma", 3)]).await;
-    run(vec![r("a", "alpha", 1), r("b", "beta", 2), r("c", "gamma", 3)]).await;
+    run(vec![
+        r("a", "alpha", 1),
+        r("b", "beta", 2),
+        r("c", "gamma", 3),
+    ])
+    .await;
+    run(vec![
+        r("a", "alpha", 1),
+        r("b", "beta", 2),
+        r("c", "gamma", 3),
+    ])
+    .await;
     run(vec![r("a", "alpha-updated", 10), r("b", "beta", 2)]).await;
 
     Ok(())

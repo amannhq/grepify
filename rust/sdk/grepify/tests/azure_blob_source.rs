@@ -7,8 +7,8 @@
 //!     cargo test -p grepify --features azure_blob --test azure_blob_source
 #![cfg(feature = "azure_blob")]
 
-use grepify::azure_blob::{self, AzureBlobClient, ListOptions};
 use grepify::Result;
+use grepify::azure_blob::{self, AzureBlobClient, ListOptions};
 
 /// Build a client from `AZURE_BLOB_TEST_CONTAINER_URL`, or `None` to skip.
 fn try_client() -> Option<AzureBlobClient> {

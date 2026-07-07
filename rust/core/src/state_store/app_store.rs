@@ -121,9 +121,9 @@ impl AppStore {
                 Ok(txn) => grepify_utils::retryable::Ok(txn),
                 Err(heed::Error::Mdb(heed::MdbError::ReadersFull)) => {
                     warn!("LMDB readers full, retrying");
-                    Err(grepify_utils::retryable::Error::retryable(
-                        internal_error!("LMDB readers full"),
-                    ))
+                    Err(grepify_utils::retryable::Error::retryable(internal_error!(
+                        "LMDB readers full"
+                    )))
                 }
                 Err(e) => Err(grepify_utils::retryable::Error::not_retryable(e)),
             }

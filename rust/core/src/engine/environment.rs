@@ -5,8 +5,8 @@ use crate::{
     state_store::{AppStore, Storage, StorageSettings, WriteTxn},
 };
 
-use grepify_utils::fingerprint::Fingerprint;
 use futures::future::BoxFuture;
+use grepify_utils::fingerprint::Fingerprint;
 use std::collections::{BTreeSet, HashMap, HashSet};
 use std::sync::RwLock;
 

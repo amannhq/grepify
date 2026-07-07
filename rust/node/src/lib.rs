@@ -28,7 +28,7 @@ pub use inspect::{
     iter_stable_paths_by_name, list_app_names, query_stable_path_details,
     query_stable_path_details_by_name, root_stable_path,
 };
-pub use js_target::{mount_js_target, JsTargetJs};
+pub use js_target::{JsTargetJs, mount_js_target};
 pub use runtime::{cancel_all_js, init_runtime, reset_global_cancellation_js};
-pub use target::{mount_dir_target, DirTargetJs};
+pub use target::{DirTargetJs, mount_dir_target};
 pub use text::{detect_code_language_js, split_text_recursive};

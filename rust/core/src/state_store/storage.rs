@@ -13,9 +13,9 @@ use crate::state::stable_path::{StablePath, StablePathPrefix, StablePathRef};
 use crate::state_store::app_store::{AppStore, Database};
 use crate::state_store::txn::WriteTxn;
 
+use futures::future::BoxFuture;
 use grepify_utils::batching::{BatchQueue, Batcher, BatchingOptions, Runner};
 use grepify_utils::deser::from_msgpack_slice;
-use futures::future::BoxFuture;
 use serde::{Deserialize, Serialize};
 use std::any::Any;
 use std::path::{Path, PathBuf};

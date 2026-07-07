@@ -121,8 +121,7 @@ where
     /// the item is handed to the core batcher (coalesced with other concurrent
     /// misses) and the result is memoized.
     pub async fn call(&self, ctx: &Ctx, item: In) -> Result<Out> {
-        let fp =
-            crate::memo::key_fingerprint_result(&("grepify_batched", self.code_hash, &item))?;
+        let fp = crate::memo::key_fingerprint_result(&("grepify_batched", self.code_hash, &item))?;
         let batcher = self.batcher.clone();
         // A batch impl is ctx-free, so it makes no tracked child `#[function]`
         // calls; the `propagate_children_fn_logic` flag is therefore inert here.

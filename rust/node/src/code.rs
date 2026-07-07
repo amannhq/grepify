@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use grepify::ops::code::{match_code as sdk_match_code, CodeMatch};
+use grepify::ops::code::{CodeMatch, match_code as sdk_match_code};
 use napi_derive::napi;
 
 use crate::chunk::ChunkJs;
@@ -15,11 +15,7 @@ pub struct CodeMatchJs {
 
 impl CodeMatchJs {
     fn from_match(m: &CodeMatch, source: &str) -> Self {
-        let chunks = m
-            .chunks
-            .iter()
-            .map(ChunkJs::from_chunk)
-            .collect::<Vec<_>>();
+        let chunks = m.chunks.iter().map(ChunkJs::from_chunk).collect::<Vec<_>>();
         let captures = m
             .captures
             .iter()
@@ -35,7 +31,11 @@ impl CodeMatchJs {
 }
 
 #[napi]
-pub fn match_code(pattern: String, source: String, language: String) -> napi::Result<Vec<CodeMatchJs>> {
+pub fn match_code(
+    pattern: String,
+    source: String,
+    language: String,
+) -> napi::Result<Vec<CodeMatchJs>> {
     let matches = sdk_match_code(&pattern, &source, &language)
         .map_err(|e| napi::Error::from_reason(e.to_string()))?;
     Ok(matches

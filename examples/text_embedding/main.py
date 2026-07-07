@@ -34,9 +34,7 @@ from grepify.resources.file import FileLike, PatternFilePathMatcher
 from grepify.resources.id import IdGenerator
 
 
-DATABASE_URL = os.getenv(
-    "POSTGRES_URL", "postgres://grepify:grepify@localhost/grepify"
-)
+DATABASE_URL = os.getenv("POSTGRES_URL", "postgres://grepify:grepify@localhost/grepify")
 TABLE_NAME = "doc_embeddings"
 PG_SCHEMA_NAME = "coco_examples"
 TOP_K = 5

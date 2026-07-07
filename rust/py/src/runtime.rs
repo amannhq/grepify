@@ -5,11 +5,11 @@ use std::{
 
 use crate::prelude::*;
 
+use futures::FutureExt;
 use grepify_core::engine::runtime::{
     cancel_all, get_runtime, reset_global_cancellation, shutdown_runtime,
 };
 use grepify_py_utils::from_py_future;
-use futures::FutureExt;
 use pyo3::{call::PyCallArgs, exceptions::PyException};
 use pyo3_async_runtimes::TaskLocals;
 use tokio_util::task::AbortOnDropHandle;

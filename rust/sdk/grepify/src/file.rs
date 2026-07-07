@@ -8,8 +8,8 @@ use std::sync::Arc;
 use std::time::SystemTime;
 
 use async_trait::async_trait;
-use grepify_utils::fingerprint::Fingerprint;
 use globset::{Glob, GlobSet, GlobSetBuilder};
+use grepify_utils::fingerprint::Fingerprint;
 use serde::{Serialize, Serializer, ser::SerializeTuple};
 use tokio::sync::Mutex;
 

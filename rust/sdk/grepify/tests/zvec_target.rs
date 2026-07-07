@@ -18,7 +18,9 @@ use grepify::{ContextKey, Environment, Result};
 use serde::Serialize;
 
 static DB: LazyLock<ContextKey<ManagedConnection>> = LazyLock::new(|| {
-    ContextKey::new_with_state("zvec_test", |c: &ManagedConnection| c.state_id().to_string())
+    ContextKey::new_with_state("zvec_test", |c: &ManagedConnection| {
+        c.state_id().to_string()
+    })
 });
 
 #[derive(Serialize, Clone)]
@@ -104,7 +106,11 @@ async fn zvec_target_creates_upserts_and_reconciles() -> Result<()> {
         row("c", "gamma", [0.0, 0.0, 1.0]),
     ])
     .await;
-    assert_eq!(conn.document_count(&collection)?, 3, "no duplicates on re-run");
+    assert_eq!(
+        conn.document_count(&collection)?,
+        3,
+        "no duplicates on re-run"
+    );
 
     // --- Run 3: update one document + drop another (orphan delete) ---
     run(vec![

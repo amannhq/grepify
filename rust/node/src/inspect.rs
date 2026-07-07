@@ -9,9 +9,7 @@
 //! the detail/query calls (the JS host holds it opaquely and passes it back).
 //! Everything here is read-only.
 
-use grepify_core::inspect::db_inspect::{
-    StablePathDetail, StablePathInfo, StablePathNodeType,
-};
+use grepify_core::inspect::db_inspect::{StablePathDetail, StablePathInfo, StablePathNodeType};
 use grepify_core::state::stable_path::StablePath;
 use napi::bindgen_prelude::Buffer;
 use napi_derive::napi;
@@ -143,7 +141,11 @@ fn detail_to_js(d: StablePathDetail) -> napi::Result<StablePathDetailJs> {
 /// `iter_stable_paths`, collected eagerly).
 #[napi]
 pub async fn iter_stable_paths(app: &AppJs) -> napi::Result<Vec<StablePathInfoJs>> {
-    let infos = app.inner.inspect_stable_path_infos().await.map_err(to_napi)?;
+    let infos = app
+        .inner
+        .inspect_stable_path_infos()
+        .await
+        .map_err(to_napi)?;
     infos.into_iter().map(info_to_js).collect()
 }
 

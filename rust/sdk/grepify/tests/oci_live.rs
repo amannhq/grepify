@@ -16,9 +16,7 @@
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use grepify::oci_object_storage::{
-    ListOptions, OciClient, OciConfig, OciFile, list_objects_live,
-};
+use grepify::oci_object_storage::{ListOptions, OciClient, OciConfig, OciFile, list_objects_live};
 use grepify::{App, LiveMapView, PatternFilePathMatcher, Result, UpdateOptions};
 use rsa::RsaPrivateKey;
 use rsa::pkcs8::{EncodePrivateKey, LineEnding};

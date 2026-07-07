@@ -468,12 +468,14 @@ struct RowAction {
 // ---------------------------------------------------------------------------
 
 fn resolve_conn(host_ctx: &Arc<ContextStore>, conn_key: &str) -> Result<Arc<BigQueryConnection>> {
-    host_ctx.resolve::<BigQueryConnection>(conn_key).ok_or_else(|| {
-        Error::engine(format!(
-            "bigquery target: connection `{conn_key}` was not provided in the environment \
+    host_ctx
+        .resolve::<BigQueryConnection>(conn_key)
+        .ok_or_else(|| {
+            Error::engine(format!(
+                "bigquery target: connection `{conn_key}` was not provided in the environment \
              (call Environment::builder().provide_key(&KEY, conn))"
-        ))
-    })
+            ))
+        })
 }
 
 struct TableHandler {
@@ -713,7 +715,11 @@ fn qualified_dataset_name(conn: &BigQueryConnection, spec: &TableSpec) -> String
     format!("`{}.{}`", project, spec.dataset)
 }
 
-async fn create_table(conn: &BigQueryConnection, spec: &TableSpec, if_not_exists: bool) -> Result<()> {
+async fn create_table(
+    conn: &BigQueryConnection,
+    spec: &TableSpec,
+    if_not_exists: bool,
+) -> Result<()> {
     if spec.managed_by.is_user() {
         return Ok(());
     }
@@ -982,7 +988,9 @@ fn row_state<R: Serialize>(row: &R, schema: &TableSchema) -> Result<Map<String, 
     let value = serde_json::to_value(row)
         .map_err(|e| Error::engine(format!("serialize BigQuery target row: {e}")))?;
     let JsonValue::Object(mut fields) = value else {
-        return Err(Error::engine("BigQuery target row must serialize to an object"));
+        return Err(Error::engine(
+            "BigQuery target row must serialize to an object",
+        ));
     };
     fields.retain(|name, _| schema.columns().contains_key(name));
     for name in schema.columns().keys() {
@@ -1018,7 +1026,9 @@ fn stable_key_to_json(key: &StableKey) -> Result<JsonValue> {
         StableKey::Int(i) => Ok(JsonValue::from(*i)),
         StableKey::Str(s) | StableKey::Symbol(s) => Ok(JsonValue::from(s.to_string())),
         StableKey::Uuid(u) => Ok(JsonValue::from(u.to_string())),
-        other => Err(Error::engine(format!("unsupported BigQuery row key: {other:?}"))),
+        other => Err(Error::engine(format!(
+            "unsupported BigQuery row key: {other:?}"
+        ))),
     }
 }
 
@@ -1060,7 +1070,9 @@ fn validate_project_id(project: &str) -> Result<()> {
     if ok {
         Ok(())
     } else {
-        Err(Error::engine(format!("invalid BigQuery project: {project}")))
+        Err(Error::engine(format!(
+            "invalid BigQuery project: {project}"
+        )))
     }
 }
 

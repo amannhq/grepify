@@ -4,7 +4,7 @@
 //! lazy content) and a `PatternFilePathMatcher`-backed options object. Mirrors
 //! the SDK `DirWalker`/`FileEntry`/`PatternFilePathMatcher` surface.
 
-use grepify::fs::{walk_dir, DirWalker, FileEntry};
+use grepify::fs::{DirWalker, FileEntry, walk_dir};
 use grepify::{MatchAllFilePathMatcher, PatternFilePathMatcher};
 use napi::bindgen_prelude::Buffer;
 use napi_derive::napi;
@@ -41,7 +41,10 @@ impl FileEntryJs {
     /// Relative path from the walk root (forward slashes).
     #[napi(getter)]
     pub fn relative_path(&self) -> String {
-        self.inner.relative_path().to_string_lossy().replace('\\', "/")
+        self.inner
+            .relative_path()
+            .to_string_lossy()
+            .replace('\\', "/")
     }
 
     /// Full filesystem path.
@@ -93,5 +96,8 @@ fn build_walker(path: String, options: Option<WalkOptions>) -> napi::Result<DirW
 pub fn walk_dir_js(path: String, options: Option<WalkOptions>) -> napi::Result<Vec<FileEntryJs>> {
     let walker = build_walker(path, options)?;
     let files = walker.walk().into_napi()?;
-    Ok(files.into_iter().map(|inner| FileEntryJs { inner }).collect())
+    Ok(files
+        .into_iter()
+        .map(|inner| FileEntryJs { inner })
+        .collect())
 }

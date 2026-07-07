@@ -46,9 +46,7 @@ def _mock_completion(matched: str | None, canonical: str = "matched") -> AsyncMo
 @pytest.mark.asyncio
 async def test_llm_happy_path_no_match() -> None:
     mock = _mock_completion(matched=None)
-    with patch(
-        "grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock
-    ):
+    with patch("grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock):
         resolver = LlmPairResolver(model="openai/gpt-4o-mini")
         result = await resolver("foo", ["bar", "baz"])
     assert result == PairDecision()
@@ -58,9 +56,7 @@ async def test_llm_happy_path_no_match() -> None:
 @pytest.mark.asyncio
 async def test_llm_happy_path_match() -> None:
     mock = _mock_completion(matched="bar", canonical="matched")
-    with patch(
-        "grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock
-    ):
+    with patch("grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock):
         resolver = LlmPairResolver(model="openai/gpt-4o-mini")
         result = await resolver("foo", ["bar", "baz"])
     assert result == PairDecision(matched="bar", canonical=CanonicalSide.MATCHED)
@@ -69,9 +65,7 @@ async def test_llm_happy_path_match() -> None:
 @pytest.mark.asyncio
 async def test_llm_match_new_canonical() -> None:
     mock = _mock_completion(matched="bar", canonical="new")
-    with patch(
-        "grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock
-    ):
+    with patch("grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock):
         resolver = LlmPairResolver(model="openai/gpt-4o-mini")
         result = await resolver("foo", ["bar", "baz"])
     assert result == PairDecision(matched="bar", canonical=CanonicalSide.NEW)
@@ -88,9 +82,7 @@ async def test_llm_hallucinated_matched_retries_then_succeeds() -> None:
         return _make_response(matched="bar")
 
     mock = AsyncMock(side_effect=_acompletion)
-    with patch(
-        "grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock
-    ):
+    with patch("grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock):
         resolver = LlmPairResolver(model="openai/gpt-4o-mini")
         result = await resolver("foo", ["bar", "baz"])
 
@@ -101,9 +93,7 @@ async def test_llm_hallucinated_matched_retries_then_succeeds() -> None:
 @pytest.mark.asyncio
 async def test_llm_retry_exhaustion_returns_no_match() -> None:
     mock = _mock_completion(matched="ghost")
-    with patch(
-        "grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock
-    ):
+    with patch("grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock):
         resolver = LlmPairResolver(model="openai/gpt-4o-mini", retries=1)
         result = await resolver("foo", ["bar", "baz"])
     assert result == PairDecision()
@@ -115,9 +105,7 @@ async def test_llm_provider_error_propagates() -> None:
         raise RuntimeError("provider down")
 
     mock = AsyncMock(side_effect=_explode)
-    with patch(
-        "grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock
-    ):
+    with patch("grepify.ops.entity_resolution.llm_resolver._litellm.acompletion", mock):
         resolver = LlmPairResolver(model="openai/gpt-4o-mini")
         with pytest.raises(Exception):
             await resolver("foo", ["bar", "baz"])

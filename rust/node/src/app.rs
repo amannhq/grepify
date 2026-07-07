@@ -10,12 +10,12 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
-use grepify::app::{App, Environment, UpdateHandle};
 use grepify::UpdateStatus;
+use grepify::app::{App, Environment, UpdateHandle};
 use grepify_core::engine::runtime::get_runtime;
+use napi::Status;
 use napi::bindgen_prelude::{Buffer, Promise};
 use napi::threadsafe_function::ThreadsafeFunction;
-use napi::Status;
 use napi_derive::napi;
 
 use crate::ctx::CtxJs;

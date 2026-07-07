@@ -8,8 +8,8 @@ use crate::engine::{app::App, profile::EngineProfile};
 use crate::state::db_schema::{self, ChildExistenceInfo, DbEntryKey, StablePathEntryKey};
 use crate::state::stable_path::{StableKey, StablePath, StablePathRef};
 use crate::state_store::AppStore;
-use grepify_utils::deser::from_msgpack_slice;
 use futures::stream::{Stream, StreamExt};
+use grepify_utils::deser::from_msgpack_slice;
 use tokio_stream::wrappers::ReceiverStream;
 
 pub async fn list_stable_paths<Prof: EngineProfile>(app: &App<Prof>) -> Result<Vec<StablePath>> {

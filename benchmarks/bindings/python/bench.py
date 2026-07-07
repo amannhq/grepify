@@ -87,7 +87,7 @@ async def _pipeline_main(corpus: pathlib.Path) -> int:
     return len(items)
 
 
-def _total_stats(handle) -> dict:
+def _total_stats(handle: coco.UpdateHandle[int]) -> dict:
     stats = handle.stats()
     if stats is None:
         return {}

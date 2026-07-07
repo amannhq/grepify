@@ -92,7 +92,11 @@ impl AzureBlobFilePath {
     /// containers and decoupled from the live connection (matches Python's
     /// `__coco_memo_key__`).
     pub fn memo_key(&self) -> impl Serialize + '_ {
-        (&self.account_name, &self.container_name, &self.relative_path)
+        (
+            &self.account_name,
+            &self.container_name,
+            &self.relative_path,
+        )
     }
 }
 
@@ -216,10 +220,9 @@ impl FileLike for AzureBlobFile {
     }
 
     async fn read_impl(&self, size: Option<usize>) -> Result<Vec<u8>> {
-        let client = self
-            .client
-            .as_ref()
-            .ok_or_else(|| Error::engine("Azure blob file is not attached to an AzureBlobClient"))?;
+        let client = self.client.as_ref().ok_or_else(|| {
+            Error::engine("Azure blob file is not attached to an AzureBlobClient")
+        })?;
         match size {
             Some(0) => Ok(Vec::new()),
             // The Azure SDK download always fetches the whole blob; take a prefix
@@ -270,12 +273,12 @@ impl AzureBlobClient {
     /// `https://myaccount.blob.core.windows.net/mycontainer`) and an optional
     /// Entra ID [`TokenCredential`]. The account and container names are derived
     /// from the URL.
-    pub fn new(
-        container_url: &str,
-        credential: Option<Arc<dyn TokenCredential>>,
-    ) -> Result<Self> {
-        let url = Url::parse(container_url)
-            .map_err(|e| Error::engine(format!("invalid Azure container URL {container_url:?}: {e}")))?;
+    pub fn new(container_url: &str, credential: Option<Arc<dyn TokenCredential>>) -> Result<Self> {
+        let url = Url::parse(container_url).map_err(|e| {
+            Error::engine(format!(
+                "invalid Azure container URL {container_url:?}: {e}"
+            ))
+        })?;
         let (account_name, container_name) = identity_from_url(&url).ok_or_else(|| {
             Error::engine(format!(
                 "Azure container URL {container_url:?} must contain an account host and a container path"
@@ -308,7 +311,9 @@ impl AzureBlobClient {
     pub fn from_container_client(client: BlobContainerClient) -> Result<Self> {
         let url = client.url().clone();
         let (account_name, container_name) = identity_from_url(&url).ok_or_else(|| {
-            Error::engine("Azure container client URL must contain an account host and container path")
+            Error::engine(
+                "Azure container client URL must contain an account host and container path",
+            )
         })?;
         let state_id = format!("azure-blob:{account_name}/{container_name}");
         Ok(Self {
@@ -347,12 +352,12 @@ impl AzureBlobClient {
             .get_properties(None)
             .await
             .map_err(|e| Error::engine(format!("azure get_properties {blob_name}: {e}")))?;
-        let size = props
-            .content_length()
+        let size = props.content_length().ok().flatten().unwrap_or(0);
+        let modified_secs = props
+            .last_modified()
             .ok()
             .flatten()
-            .unwrap_or(0);
-        let modified_secs = props.last_modified().ok().flatten().map(|d| d.unix_timestamp());
+            .map(|d| d.unix_timestamp());
         let etag = props.etag().ok().flatten().map(|e| e.to_string());
         Ok(AzureBlobFile::new(
             Some(self.clone()),
@@ -389,9 +394,7 @@ impl AzureBlobClient {
 fn identity_from_url(url: &Url) -> Option<(String, String)> {
     let host = url.host_str()?;
     let account = host.split('.').next().filter(|s| !s.is_empty())?;
-    let container = url
-        .path_segments()?
-        .find(|seg| !seg.is_empty())?;
+    let container = url.path_segments()?.find(|seg| !seg.is_empty())?;
     Some((account.to_string(), container.to_string()))
 }
 
@@ -530,7 +533,10 @@ mod tests {
             relative_key("data/", "data/a/b.md").as_deref(),
             Some("a/b.md")
         );
-        assert_eq!(relative_key("data", "data/a/b.md").as_deref(), Some("a/b.md"));
+        assert_eq!(
+            relative_key("data", "data/a/b.md").as_deref(),
+            Some("a/b.md")
+        );
         assert_eq!(relative_key("", "a/"), None);
         assert_eq!(relative_key("data/", "data/"), None);
         assert_eq!(relative_key("data/x", "data/x"), None);

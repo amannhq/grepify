@@ -2,12 +2,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
 
+use criterion::{BenchmarkId, Criterion, SamplingMode, black_box, criterion_group, criterion_main};
 use grepify::memo::{
     finish_key_fingerprinter, key_bytes_result, new_key_fingerprinter, write_key_fingerprint_part,
 };
 use grepify::walk;
 use grepify_utils::fingerprint::Fingerprint;
-use criterion::{BenchmarkId, Criterion, SamplingMode, black_box, criterion_group, criterion_main};
 use rustc_hash::FxHashSet;
 use serde::{Deserialize, Serialize};
 use tempfile::TempDir;

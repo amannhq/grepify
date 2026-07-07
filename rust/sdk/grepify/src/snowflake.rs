@@ -464,10 +464,7 @@ struct RowAction {
 // Table container handler (root)
 // ---------------------------------------------------------------------------
 
-fn resolve_conn(
-    host_ctx: &Arc<ContextStore>,
-    conn_key: &str,
-) -> Result<Arc<SnowflakeConnection>> {
+fn resolve_conn(host_ctx: &Arc<ContextStore>, conn_key: &str) -> Result<Arc<SnowflakeConnection>> {
     host_ctx
         .resolve::<SnowflakeConnection>(conn_key)
         .ok_or_else(|| {
@@ -1003,7 +1000,9 @@ fn row_state<R: Serialize>(row: &R, schema: &TableSchema) -> Result<Map<String, 
     let value = serde_json::to_value(row)
         .map_err(|e| Error::engine(format!("serialize Snowflake target row: {e}")))?;
     let JsonValue::Object(mut fields) = value else {
-        return Err(Error::engine("Snowflake target row must serialize to an object"));
+        return Err(Error::engine(
+            "Snowflake target row must serialize to an object",
+        ));
     };
     fields.retain(|name, _| schema.columns().contains_key(name));
     for name in schema.columns().keys() {
@@ -1039,7 +1038,9 @@ fn stable_key_to_json(key: &StableKey) -> Result<JsonValue> {
         StableKey::Int(i) => Ok(JsonValue::from(*i)),
         StableKey::Str(s) | StableKey::Symbol(s) => Ok(JsonValue::from(s.to_string())),
         StableKey::Uuid(u) => Ok(JsonValue::from(u.to_string())),
-        other => Err(Error::engine(format!("unsupported Snowflake row key: {other:?}"))),
+        other => Err(Error::engine(format!(
+            "unsupported Snowflake row key: {other:?}"
+        ))),
     }
 }
 
@@ -1064,9 +1065,9 @@ fn json_scalar_to_stable_key(value: &JsonValue) -> Result<StableKey> {
 
 fn validate_snowflake_type(value: &str) -> Result<()> {
     if value.is_empty()
-        || !value.chars().all(|c| {
-            c.is_ascii_alphanumeric() || matches!(c, '_' | '(' | ')' | ',' | ' ')
-        })
+        || !value
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '(' | ')' | ',' | ' '))
     {
         return Err(Error::engine(format!("invalid Snowflake type: {value}")));
     }
@@ -1101,7 +1102,10 @@ mod tests {
 
     #[test]
     fn qualified_name_quotes_all_parts() {
-        assert_eq!(qualified_table_name(&spec(schema())), "\"db\".\"sc\".\"items\"");
+        assert_eq!(
+            qualified_table_name(&spec(schema())),
+            "\"db\".\"sc\".\"items\""
+        );
     }
 
     #[test]
@@ -1127,7 +1131,10 @@ mod tests {
             &["a".to_string(), "b".to_string()],
             &[vec![JsonValue::from(1), JsonValue::from("y")]],
         );
-        assert_eq!(composite, "DELETE FROM \"t\" WHERE (\"a\" = 1 AND \"b\" = 'y')");
+        assert_eq!(
+            composite,
+            "DELETE FROM \"t\" WHERE (\"a\" = 1 AND \"b\" = 'y')"
+        );
     }
 
     #[test]

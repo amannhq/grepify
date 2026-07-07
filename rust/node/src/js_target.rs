@@ -25,9 +25,9 @@ use grepify::target_state::{
     TargetStateProvider, declare_target_state, register_root_target_states_provider,
 };
 use grepify_utils::fingerprint::Fingerprint;
+use napi::Status;
 use napi::bindgen_prelude::{Buffer, Promise};
 use napi::threadsafe_function::ThreadsafeFunction;
-use napi::Status;
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 
@@ -180,7 +180,9 @@ impl JsTargetJs {
 /// Mount a custom JS target rooted at the unique `name`. `applyActions` is
 /// invoked (async) with each reconciled batch of upserts/deletes. Must be called
 /// inside an `App.update()` pipeline.
-#[napi(ts_args_type = "ctx: CtxJs, name: string, applyActions: (actions: Array<JsTargetAction>) => Promise<void>")]
+#[napi(
+    ts_args_type = "ctx: CtxJs, name: string, applyActions: (actions: Array<JsTargetAction>) => Promise<void>"
+)]
 pub fn mount_js_target(
     ctx: &CtxJs,
     name: String,
@@ -189,6 +191,7 @@ pub fn mount_js_target(
     let handler = JsRowHandler {
         apply: Arc::new(apply_actions),
     };
-    let provider = register_root_target_states_provider(&ctx.inner, name, handler).map_err(to_napi)?;
+    let provider =
+        register_root_target_states_provider(&ctx.inner, name, handler).map_err(to_napi)?;
     Ok(JsTargetJs { provider })
 }

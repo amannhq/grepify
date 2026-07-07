@@ -190,8 +190,7 @@ impl BoxedHandler {
             Option<&Value>,
             &[Value],
             bool,
-        )
-            -> grepify_utils::error::Result<Option<TargetReconcileOutput<RustProfile>>>
+        ) -> grepify_utils::error::Result<Option<TargetReconcileOutput<RustProfile>>>
         + Send
         + Sync
         + 'static,

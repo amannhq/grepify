@@ -201,8 +201,7 @@ async fn reserve_memoization_inner(
     comp_ctx: PyComponentProcessorContext,
     memo_fp: PyFingerprint,
 ) -> Result<Py<PyAny>> {
-    let guard =
-        grepify_core::engine::function::reserve_memoization(&comp_ctx.0, memo_fp.0).await?;
+    let guard = grepify_core::engine::function::reserve_memoization(&comp_ctx.0, memo_fp.0).await?;
 
     Python::attach(|py| {
         // Extract cached data (if cache hit) as PyStoredValue objects (not inner Python objects).

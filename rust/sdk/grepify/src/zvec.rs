@@ -37,7 +37,9 @@ use zvec::{Collection, CollectionOptions, Doc, FieldSchema, MetricType, Quantize
 
 use crate::ctx::{ContextKey, ContextStore, Ctx};
 use crate::error::{Error, Result};
-use crate::statediff::{DiffAction, ManagedBy, MutualTrackingRecord, diff, resolve_system_transition};
+use crate::statediff::{
+    DiffAction, ManagedBy, MutualTrackingRecord, diff, resolve_system_transition,
+};
 use crate::target_state::{
     ChildTargetDef, StableKey, TargetAction, TargetActionSink, TargetChildInvalidation,
     TargetHandler, TargetReconcileOutput, TargetState, TargetStateProvider, declare_target_state,
@@ -55,9 +57,7 @@ fn validate_identifier(name: &str, kind: &str) -> Result<()> {
         .chars()
         .next()
         .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
-        && name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '_');
+        && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_');
     if ok {
         Ok(())
     } else {
@@ -128,7 +128,11 @@ impl ManagedConnection {
     }
 
     /// Open the collection, creating it from `schema` if it doesn't exist yet.
-    fn open_or_create(&self, name: &str, schema: &zvec::CollectionSchema) -> Result<Arc<Collection>> {
+    fn open_or_create(
+        &self,
+        name: &str,
+        schema: &zvec::CollectionSchema,
+    ) -> Result<Arc<Collection>> {
         let mut open = self.open.lock().unwrap();
         if let Some(col) = open.get(name) {
             return Ok(col.clone());
@@ -283,7 +287,10 @@ impl VectorField {
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 enum FieldKind {
-    Scalar { data_type: ScalarType, indexed: bool },
+    Scalar {
+        data_type: ScalarType,
+        indexed: bool,
+    },
     DenseVector(VectorField),
 }
 
@@ -424,7 +431,10 @@ impl CollectionSchemaBuilder {
 }
 
 /// Build the native zvec schema from our [`CollectionSchema`].
-fn build_zvec_schema(collection_name: &str, schema: &CollectionSchema) -> Result<zvec::CollectionSchema> {
+fn build_zvec_schema(
+    collection_name: &str,
+    schema: &CollectionSchema,
+) -> Result<zvec::CollectionSchema> {
     let mut builder = zvec::CollectionSchema::builder(collection_name);
     for (name, def) in &schema.fields {
         let field = match &def.kind {
@@ -488,7 +498,11 @@ pub fn collection_target(
     validate_collection_name(&collection_name)?;
     let provider = register_root_target_states_provider(
         ctx,
-        format!("grepify/zvec/collection/{}/{}", conn.name(), collection_name),
+        format!(
+            "grepify/zvec/collection/{}/{}",
+            conn.name(),
+            collection_name
+        ),
         CollectionHandler {
             conn_key: conn.name().to_string(),
         },
@@ -767,7 +781,11 @@ impl TargetHandler<DocState> for DocHandler {
     ) -> Result<Option<TargetReconcileOutput<DocAction, Fingerprint>>> {
         let doc_id = match &key {
             StableKey::Str(s) | StableKey::Symbol(s) => s.to_string(),
-            other => return Err(Error::engine(format!("zvec document key must be a string: {other:?}"))),
+            other => {
+                return Err(Error::engine(format!(
+                    "zvec document key must be a string: {other:?}"
+                )));
+            }
         };
         let desired_fp = match &desired {
             Some(state) => Some(Fingerprint::from(state).map_err(Error::from)?),
@@ -907,7 +925,9 @@ fn build_doc(schema: &CollectionSchema, state: &DocState) -> Result<Doc> {
             },
             FieldKind::DenseVector(_) => {
                 let vector = json_to_f32_vec(value).ok_or_else(|| {
-                    Error::engine(format!("zvec vector field {name:?} must be an array of numbers"))
+                    Error::engine(format!(
+                        "zvec vector field {name:?} must be an array of numbers"
+                    ))
                 })?;
                 doc.add_vector_fp32(name, &vector).map_err(zv_err)?;
             }
@@ -935,9 +955,9 @@ fn doc_state<R: Serialize>(
         return Err(Error::engine("zvec target row must serialize to an object"));
     };
 
-    let pk_value = obj
-        .get(&schema.id_field)
-        .ok_or_else(|| Error::engine(format!("missing primary key column {:?}", schema.id_field)))?;
+    let pk_value = obj.get(&schema.id_field).ok_or_else(|| {
+        Error::engine(format!("missing primary key column {:?}", schema.id_field))
+    })?;
     if pk_value.is_null() {
         return Err(Error::engine(format!(
             "zvec primary key {:?} value cannot be null",
@@ -1028,7 +1048,10 @@ mod tests {
                     },
                     SchemaField {
                         name: "embedding".into(),
-                        logical_type: LogicalType::Vector { dim: 8, half: false },
+                        logical_type: LogicalType::Vector {
+                            dim: 8,
+                            half: false,
+                        },
                         nullable: false,
                     },
                 ]

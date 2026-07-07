@@ -26,6 +26,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent.parent
@@ -155,7 +156,7 @@ def run_host(host: str, args: argparse.Namespace) -> dict | None:
 
 
 def artifact_sizes() -> dict:
-    sizes: dict[str, int | None] = {}
+    sizes: dict[str, dict[str, int] | int | None] = {}
     node_bins = sorted(PACKAGES_NODE.glob("*.node"))
     sizes["node_addon"] = (
         {p.name: p.stat().st_size for p in node_bins} if node_bins else None
@@ -165,12 +166,12 @@ def artifact_sizes() -> dict:
     return sizes
 
 
-def _fmt(v) -> str:
+def _fmt(v: object) -> str:
     return "—" if v is None else str(v)
 
 
-def _get(results: dict, host: str, *path):
-    cur = results.get(host)
+def _get(results: dict, host: str, *path: str) -> Any:
+    cur: Any = results.get(host)
     for p in path:
         if not isinstance(cur, dict):
             return None

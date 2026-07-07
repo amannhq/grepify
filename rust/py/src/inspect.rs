@@ -8,11 +8,11 @@ use crate::{
     stable_path::{PyStableKey, PyStablePath},
 };
 
+use futures::stream::Stream;
 use grepify_core::engine::runtime::get_runtime;
 use grepify_core::inspect::db_inspect;
 use grepify_core::inspect::db_inspect::StablePathNodeType;
 use grepify_core::state::stable_path::StableKey;
-use futures::stream::Stream;
 use pyo3::exceptions::PyStopAsyncIteration;
 use pyo3_async_runtimes::tokio::future_into_py;
 

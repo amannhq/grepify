@@ -1,4 +1,4 @@
-use grepify::ops::text::{detect_code_language, RecursiveChunkConfig, RecursiveSplitter};
+use grepify::ops::text::{RecursiveChunkConfig, RecursiveSplitter, detect_code_language};
 use napi_derive::napi;
 
 use crate::chunk::ChunkJs;
@@ -18,9 +18,11 @@ pub fn detect_code_language_js(filename: String) -> Option<String> {
 }
 
 #[napi]
-pub fn split_text_recursive(source: String, config: RecursiveChunkConfigJs) -> napi::Result<Vec<ChunkJs>> {
-    let splitter = RecursiveSplitter::new()
-        .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+pub fn split_text_recursive(
+    source: String,
+    config: RecursiveChunkConfigJs,
+) -> napi::Result<Vec<ChunkJs>> {
+    let splitter = RecursiveSplitter::new().map_err(|e| napi::Error::from_reason(e.to_string()))?;
     let chunks = splitter.split_with(
         &source,
         RecursiveChunkConfig {

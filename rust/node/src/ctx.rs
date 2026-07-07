@@ -17,9 +17,9 @@ use futures::future::try_join_all;
 use grepify::Ctx;
 use grepify_core::engine::runtime::get_runtime;
 use grepify_utils::fingerprint::Fingerprint;
+use napi::Status;
 use napi::bindgen_prelude::{Buffer, FnArgs, Promise};
 use napi::threadsafe_function::ThreadsafeFunction;
-use napi::Status;
 use napi_derive::napi;
 
 use crate::error::to_napi;
@@ -27,12 +27,16 @@ use crate::error::to_napi;
 /// A JS processor invoked with `(childCtx, valueBuffer)` returning
 /// `Promise<Buffer>`. `CalleeHandled = false`: called with plain args (no
 /// Node error-first convention).
-pub(crate) type ProcessorTsfn =
-    ThreadsafeFunction<FnArgs<(CtxJs, Buffer)>, Promise<Buffer>, FnArgs<(CtxJs, Buffer)>, Status, false>;
+pub(crate) type ProcessorTsfn = ThreadsafeFunction<
+    FnArgs<(CtxJs, Buffer)>,
+    Promise<Buffer>,
+    FnArgs<(CtxJs, Buffer)>,
+    Status,
+    false,
+>;
 
 /// A JS processor invoked with just `(childCtx)` returning `Promise<Buffer>`.
-pub(crate) type CtxProcessorTsfn =
-    ThreadsafeFunction<CtxJs, Promise<Buffer>, CtxJs, Status, false>;
+pub(crate) type CtxProcessorTsfn = ThreadsafeFunction<CtxJs, Promise<Buffer>, CtxJs, Status, false>;
 
 /// Invoke a `(ctx, value)` JS processor and await its resolved bytes.
 async fn call_processor(
@@ -180,7 +184,11 @@ impl CtxJs {
         ts_args_type = "keyBytes: Buffer, processor: (ctx: CtxJs) => Promise<Buffer>",
         ts_return_type = "Promise<Buffer>"
     )]
-    pub async fn memo(&self, key_bytes: Buffer, processor: CtxProcessorTsfn) -> napi::Result<Buffer> {
+    pub async fn memo(
+        &self,
+        key_bytes: Buffer,
+        processor: CtxProcessorTsfn,
+    ) -> napi::Result<Buffer> {
         let ctx = self.inner.clone();
         let key = key_bytes.to_vec();
         let processor = std::sync::Arc::new(processor);
