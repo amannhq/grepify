@@ -91,10 +91,10 @@ def test_use_state_persists_across_runs() -> None:
     assert _captured["a"] == 0  # initial
 
     app.update_blocking()
-    assert _captured["a"] == 1  # stored from previous run
+    assert _captured["a"] == 1  # type: ignore[comparison-overlap]  # stored from previous run
 
     app.update_blocking()
-    assert _captured["a"] == 2  # stored from previous run
+    assert _captured["a"] == 2  # type: ignore[comparison-overlap]  # stored from previous run
 
 
 def test_use_state_independent_per_component() -> None:
@@ -109,8 +109,8 @@ def test_use_state_independent_per_component() -> None:
     assert _captured["y"] == 0
 
     app.update_blocking()
-    assert _captured["x"] == 1
-    assert _captured["y"] == 1
+    assert _captured["x"] == 1  # type: ignore[comparison-overlap]
+    assert _captured["y"] == 1  # type: ignore[comparison-overlap]
 
 
 def test_use_state_resets_after_component_deleted() -> None:
@@ -124,7 +124,7 @@ def test_use_state_resets_after_component_deleted() -> None:
     assert _captured["a"] == 0
 
     app.update_blocking()
-    assert _captured["a"] == 1
+    assert _captured["a"] == 1  # type: ignore[comparison-overlap]
 
     # Delete the component by removing "a" from source.
     _source_items.clear()
