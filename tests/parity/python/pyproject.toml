@@ -1,0 +1,14 @@
+[project]
+name = "grepify_parity_python"
+version = "0.1.0"
+description = "Python side of the cross-language parity harness"
+requires-python = ">=3.11"
+dependencies = [
+    "grepify",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+grepify = { path = "../../../", editable = true }

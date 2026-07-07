@@ -1,0 +1,213 @@
+---
+title: Grepify *quickstart*
+description: >
+  Build your first Grepify pipeline in 5 minutes: convert PDFs to Markdown
+  and watch incremental processing only reprocess files that actually changed.
+---
+import AppExample from '/src/components/diagrams/concepts/AppExample.astro';
+import FileProcess from '/src/components/diagrams/concepts/FileProcess.astro';
+import ComponentsFanout from '/src/components/diagrams/concepts/ComponentsFanout.astro';
+import AppDef from '/src/components/diagrams/concepts/AppDef.astro';
+import ScarfPixel from '/src/components/ScarfPixel.astro';
+import { SCARF_QUICKSTART_PIXEL_ID } from '/src/consts';
+
+In this tutorial, we'll build a simple app that converts PDF files to Markdown and saves them to a local directory.
+
+
+
+## Overview
+
+<AppExample />
+
+1. Read PDF files from a local directory
+2. Convert each file to Markdown using Docling
+3. Save the Markdown files to an output directory (as **target states**)
+
+You declare the transformation logic with native Python without worrying about changes.
+
+Think: **target_state = transformation(source_state)**
+
+When your source data is updated, or your processing logic is changed (for example, switching parsers or tweaking conversion settings), Grepify performs smart incremental processing that only reprocesses the minimum. And it keeps your Markdown files always up to date.
+
+## Setup
+
+1. Install Grepify (see [Installation](./installation) for other package managers) and the Docling dependency:
+
+    ```bash
+    pip install -U grepify docling
+    ```
+
+2. Create a new directory for your project:
+
+    ```bash
+    mkdir grepify-quickstart
+    cd grepify-quickstart
+    ```
+
+3. Create a `pdf_files/` directory and add your PDF files:
+
+    ```bash
+    mkdir pdf_files
+    ```
+    You can download sample PDF files from the [git repo](https://github.com/grepify/grepify/tree/main/examples/pdf_to_markdown).
+
+4. Create a `.env` file to configure the database path:
+
+    ```bash
+    echo "GREPIFY_DB=./grepify.db" > .env
+    ```
+
+## Define the app
+
+At a high level, the app has three layers:
+
+1. **App** — binds the pipeline function to concrete input and output paths
+2. **Main function** — finds PDF files and mounts one processing component per file
+3. **File processing** — converts one PDF to Markdown and declares the output file
+
+We'll define the code in the opposite order so each Python symbol exists before it is referenced.
+
+Create a new file `main.py`. We'll define the processing functions first, then wire them into an App.
+
+### Define file processing
+
+<FileProcess />
+
+This function converts a single PDF to Markdown:
+
+```python title="main.py"
+import pathlib
+
+import grepify as coco
+from grepify.connectors import localfs
+from grepify.resources.file import PatternFilePathMatcher
+from docling.datamodel.accelerator_options import AcceleratorDevice, AcceleratorOptions
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
+
+_pipeline_options = PdfPipelineOptions(
+    accelerator_options=AcceleratorOptions(device=AcceleratorDevice.CPU)
+)
+_converter = DocumentConverter(
+    format_options={
+        InputFormat.PDF: PdfFormatOption(pipeline_options=_pipeline_options)
+    }
+)
+
+@coco.fn(memo=True)
+def process_file(
+    file: localfs.File,
+    outdir: pathlib.Path,
+) -> None:
+    markdown = _converter.convert(
+        file.file_path.resolve()
+    ).document.export_to_markdown()
+    outname = file.file_path.path.stem + ".md"
+    localfs.declare_file(outdir / outname, markdown, create_parent_dirs=True)
+```
+
+- **`localfs.File`** — A file object returned by `localfs.walk_dir()`, implementing the [`FileLike`](../common_resources/data_types#filelike) base class. See the [localfs connector](../connectors/localfs) for full details.
+- **`memo=True`** — Caches results; unchanged files are skipped on re-runs
+- **`localfs.declare_file()`** — Declares a file [target state](../programming_guide/target_state); auto-deleted if source is removed. See [localfs as target](../connectors/localfs#as-target) for the full API.
+
+
+
+
+### Define the main function
+
+<ComponentsFanout />
+
+```python title="main.py"
+@coco.fn
+async def app_main(sourcedir: pathlib.Path, outdir: pathlib.Path) -> None:
+    files = localfs.walk_dir(
+        sourcedir,
+        recursive=True,
+        path_matcher=PatternFilePathMatcher(included_patterns=["**/*.pdf"]),
+    )
+    await coco.mount_each(process_file, files.items(), outdir)
+```
+
+`mount_each()` mounts one processing component per file. Each item from `files.items()` is a `(key, file)` pair — the key (the file's relative path) becomes the component subpath automatically.
+
+It's up to you to pick the process granularity — it can be at directory level, at file level, or at page level. In this example, because we want to independently convert each file to Markdown, the file level is the most natural choice.
+
+
+
+### Create the App
+
+<AppDef />
+
+```python title="main.py"
+app = coco.App(
+    "PdfToMarkdown",
+    app_main,
+    sourcedir=pathlib.Path("./pdf_files"),
+    outdir=pathlib.Path("./out"),
+)
+```
+This defines a Grepify App — the top-level runnable unit in Grepify. It binds the main function with its arguments.
+
+
+
+## Run the pipeline
+
+Run the pipeline:
+
+```bash
+grepify update main.py
+```
+
+Grepify will:
+
+1. Create the `out/` directory
+2. Convert each PDF in `pdf_files/` to Markdown in `out/`
+
+Check the output:
+
+```bash
+ls out/
+# example.md (one .md file for each input PDF)
+```
+
+## Incremental updates
+
+The power of Grepify is **incremental processing**. Try these:
+
+**Add a new file:**
+
+Add a new PDF to `pdf_files/`, then run:
+
+```bash
+grepify update main.py
+```
+
+Only the new file is processed.
+
+**Modify a file:**
+
+Replace a PDF in `pdf_files/` with an updated version, then run:
+
+```bash
+grepify update main.py
+```
+
+Only the changed file is reprocessed.
+
+**Delete a file:**
+
+```bash
+rm pdf_files/example.pdf
+grepify update main.py
+```
+
+The corresponding Markdown file is automatically removed.
+
+## Next steps
+
+- Read [Core Concepts](../programming_guide/core_concepts) to understand the mental model — state-driven programming, processing components, and memoization
+- Dive into the [Programming Guide](../programming_guide/app), starting with Apps, to learn how to build more complex pipelines
+- Browse more [examples](https://github.com/grepify/grepify/tree/main/examples) for real-world patterns (text embedding, RAG, knowledge graphs)
+
+<ScarfPixel pxid={SCARF_QUICKSTART_PIXEL_ID} />

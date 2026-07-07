@@ -1,0 +1,5 @@
+.work/
+python/.venv/
+ts/node_modules/
+rust/target/
+rust/Cargo.lock

@@ -1,0 +1,9 @@
+[project]
+name = "files-transform"
+version = "0.1.0"
+description = "Simple example for grepify: transform files in a directory."
+requires-python = ">=3.11"
+dependencies = ["grepify>=1.0.7", "markdown-it-py[linkify,plugins]"]
+
+[tool.setuptools]
+packages = []

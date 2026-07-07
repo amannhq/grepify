@@ -1,0 +1,22 @@
+{
+  "_comment": "Single source of truth for the stateless-ops golden test. Both the Python (grepify) and TypeScript (@grepify/node) drivers read this file, run the SAME inputs through the shared Rust engine, and emit a normalized JSON result that the parity runner compares for deep equality. Paths are relative to tests/parity/fixtures/.",
+  "split_cases": [
+    { "name": "markdown_alpha", "file": "corpus/alpha.md", "chunk_size": 200, "chunk_overlap": 40, "language": "markdown" },
+    { "name": "markdown_beta", "file": "corpus/beta.md", "chunk_size": 150, "language": "markdown" },
+    { "name": "python_source", "file": "code/sample.py", "chunk_size": 120, "language": "python" }
+  ],
+  "match_cases": [
+    { "name": "py_defs", "file": "code/sample.py", "pattern": "def \\NAME(\\(ARGS*\\)):", "language": "python" },
+    { "name": "py_process_calls", "file": "code/sample.py", "pattern": "process(\\X)", "language": "python" }
+  ],
+  "index_terms_cases": [
+    { "name": "py_terms", "file": "code/sample.py", "language": "python", "min_len": 3 }
+  ],
+  "detect_language_cases": [
+    { "name": "py", "filename": "sample.py" },
+    { "name": "ts", "filename": "index.ts" },
+    { "name": "rs", "filename": "main.rs" },
+    { "name": "md", "filename": "README.md" },
+    { "name": "unknown", "filename": "data.unknownext" }
+  ]
+}

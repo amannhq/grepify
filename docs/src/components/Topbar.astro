@@ -1,0 +1,19 @@
+---
+// Simple docs header: wordmark + GitHub link.
+import { GITHUB_REPO } from '../consts';
+
+interface Props {
+  /** Kept for call-site compatibility; the simple header has no drawer. */
+  mobileSheetId?: string;
+}
+Astro.props as Props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<header class="topbar">
+  <a class="wordmark" href={`${base}/`}>Grepify</a>
+  <nav>
+    <a href={`${base}/`}>Docs</a>
+    <a href={GITHUB_REPO} target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header>

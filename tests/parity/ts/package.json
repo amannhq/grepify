@@ -1,0 +1,14 @@
+{
+  "name": "grepify-parity-ts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript side of the cross-language parity harness",
+  "scripts": {
+    "pipeline": "tsx pipeline.ts",
+    "stateless": "tsx stateless.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

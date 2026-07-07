@@ -1,0 +1,160 @@
+# Project Setup Guide
+
+Setting up Grepify projects for different use cases.
+
+## Creating a New Project
+
+```bash
+grepify init my-project
+cd my-project
+```
+
+This creates: `main.py`, `pyproject.toml`, `README.md`. The generated `main.py` sets the internal database location in its lifespan via `builder.settings.db_path = pathlib.Path("./grepify.db")`.
+
+```bash
+uv run grepify update main.py   # or: pip install -e . && grepify update main.py
+```
+
+## Dependencies by Use Case
+
+### Vector Embedding Pipeline
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "sentence-transformers",
+    "asyncpg",
+]
+```
+
+### PostgreSQL Integration
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "asyncpg",
+]
+```
+
+### SQLite Integration
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "sqlite-vec",
+]
+```
+
+### LanceDB Integration
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "lancedb",
+]
+```
+
+### Qdrant Integration
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "qdrant-client",
+]
+```
+
+### Kafka Integration
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "confluent-kafka",
+]
+```
+
+### LLM-Based Extraction
+
+```toml
+[project]
+dependencies = [
+    "grepify>=1.0.0",
+    "litellm",
+    "instructor",
+    "pydantic>=2.0",
+    "asyncpg",
+]
+```
+
+---
+
+## Environment Configuration
+
+### `.env` File
+
+The `grepify` CLI automatically loads `.env` from the current directory (via `find_dotenv`).
+
+```bash
+# Grepify internal database (optional fallback).
+# Only used if the lifespan does not set builder.settings.db_path.
+# The `grepify init` template sets db_path in the lifespan instead, so this is not needed there.
+GREPIFY_DB=./grepify.db
+
+# PostgreSQL (if using)
+POSTGRES_URL=postgres://user:pass@localhost/db
+
+# Qdrant (if using)
+QDRANT_URL=http://localhost:6333
+
+# API keys (if using LLM extraction)
+OPENAI_API_KEY=your-openai-api-key
+ANTHROPIC_API_KEY=your-anthropic-api-key
+```
+
+### Manual Settings (in lifespan)
+
+```python
+@coco.lifespan
+def coco_lifespan(builder: coco.EnvironmentBuilder) -> Iterator[None]:
+    builder.settings.db_path = pathlib.Path("./custom.db")
+    yield
+```
+
+---
+
+## Running Your Pipeline
+
+```bash
+pip install -e .                    # Install dependencies
+grepify update main.py            # Run pipeline
+grepify update main.py -L         # Run in live mode
+grepify show main.py              # Show component paths
+grepify drop main.py -f           # Reset everything
+```
+
+---
+
+## Common Issues
+
+### Import Errors
+
+```bash
+pip install -e .
+```
+
+### Database Connection Errors
+
+Verify database is running and `.env` has correct URLs. See [setup_database.md](./setup_database.md).
+
+---
+
+## See Also
+
+- [Database Setup](./setup_database.md)
+- [Patterns](./patterns.md)
+- [API Reference](./api_reference.md)

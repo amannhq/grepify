@@ -1,0 +1,13 @@
+{
+  "name": "grepify-bindings-bench-ts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript side of the Grepify binding benchmarks",
+  "scripts": {
+    "bench": "tsx bench.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

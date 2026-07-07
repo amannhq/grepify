@@ -1,0 +1,38 @@
+---
+// Docs 404.
+import '../styles/globals.css';
+import Topbar from '../components/Topbar.astro';
+import Foot from '../components/Foot.astro';
+import { THEME_COLOR } from '../consts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content={THEME_COLOR} />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>404 · Page not found</title>
+    <meta name="description" content="That page wandered off. Let's get you back to something that exists." />
+    <link rel="icon" href={`${base}/img/favicon.ico`} />
+  </head>
+  <body>
+    <Topbar />
+    <main class="nf">
+      <h1>404 — page not found</h1>
+      <p>
+        We looked everywhere — nothing here. Maybe the URL had a typo, or the page was removed.
+      </p>
+      <p><a href={base}>Back to the docs</a></p>
+    </main>
+    <Foot />
+
+    <style>
+      .nf { max-width: 640px; margin: 80px auto; padding: 0 20px; min-height: 40vh; }
+    </style>
+  </body>
+</html>

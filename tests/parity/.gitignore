@@ -1,0 +1,8 @@
+# Scratch dir: output dirs, LMDB db_paths, metrics, results.
+.work/
+
+# Python driver venv (uv).
+python/.venv/
+
+# TS driver deps.
+ts/node_modules/

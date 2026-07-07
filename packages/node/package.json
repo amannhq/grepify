@@ -1,0 +1,66 @@
+{
+  "name": "@grepify/node",
+  "version": "0.1.0",
+  "description": "Native Node.js bindings for Grepify — a lightweight code index for any harness",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "grepify": "bin/grepify.mjs"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 18"
+  },
+  "napi": {
+    "name": "grepify-node",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "aarch64-unknown-linux-musl"
+      ]
+    }
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release --manifest-path ../../rust/node/Cargo.toml --package grepify_node --output-dir . --js binding.js --dts binding.d.ts",
+    "build:debug": "napi build --platform --manifest-path ../../rust/node/Cargo.toml --package grepify_node --output-dir . --js binding.js --dts binding.d.ts",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.0.0",
+    "@types/node": "^22.0.0",
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "@grepify/node-darwin-arm64": "0.1.0",
+    "@grepify/node-darwin-x64": "0.1.0",
+    "@grepify/node-linux-arm64-gnu": "0.1.0",
+    "@grepify/node-linux-x64-gnu": "0.1.0",
+    "@grepify/node-win32-x64-msvc": "0.1.0"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "browser.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "grepify",
+    "code-index",
+    "napi-rs",
+    "tree-sitter"
+  ],
+  "dependencies": {
+    "@msgpack/msgpack": "^3.1.3",
+    "commander": "^12.1.0"
+  }
+}

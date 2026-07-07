@@ -1,0 +1,43 @@
+---
+// Section-overview card grid: groups of link cards, each with a title and a
+// one-line body. Replaces the shared brand component with a small local one;
+// `glyph` and `accent` are accepted for data compatibility but unused.
+export interface DocCardData {
+  href: string;
+  title: string;
+  body: string;
+  glyph?: string;
+}
+
+export interface DocCardGroup {
+  label?: string;
+  blurb?: string;
+  accent?: string;
+  cards: DocCardData[];
+}
+
+export interface Props {
+  groups: DocCardGroup[];
+}
+
+const { groups } = Astro.props;
+---
+
+{groups.map((group) => (
+  <section class="doc-card-section">
+    {group.label && <h3>{group.label}</h3>}
+    {group.blurb && <p class="dc-blurb">{group.blurb}</p>}
+    <div class="doc-card-grid">
+      {group.cards.map((card) => (
+        <a class="doc-card" href={card.href}>
+          <div class="dc-title">{card.title}</div>
+          <div class="dc-body">{card.body}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+))}
+
+<style>
+  .dc-blurb { color: var(--muted); margin-top: -4px; }
+</style>

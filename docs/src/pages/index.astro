@@ -1,0 +1,75 @@
+---
+// Docs landing page — a simple "About Grepify" front door for the docs tree.
+import '../styles/globals.css';
+import Topbar from '../components/Topbar.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Foot from '../components/Foot.astro';
+import DocCardGrid from '../components/DocCardGrid.astro';
+import { SITE_URL, THEME_COLOR, GITHUB_REPO } from '../consts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const canonical = new URL(`${base}/`, SITE_URL).toString();
+
+const groups = [
+  {
+    label: 'Start here',
+    blurb: 'Install Grepify and run your first incremental pipeline.',
+    cards: [
+      { href: `${base}/getting_started/overview/`, title: 'Overview', body: 'What Grepify is and the declarative mental model behind it.' },
+      { href: `${base}/getting_started/installation/`, title: 'Installation', body: 'Install the grepify package and its optional extras.' },
+      { href: `${base}/getting_started/quickstart/`, title: 'Quickstart', body: 'Build a working index in a few minutes.' },
+    ],
+  },
+  {
+    label: 'Learn the model',
+    blurb: 'The concepts every Grepify app is built from.',
+    cards: [
+      { href: `${base}/programming_guide/core_concepts/`, title: 'Core concepts', body: 'Apps, processing components, target states, and functions.' },
+      { href: `${base}/programming_guide/`, title: 'Programming guide', body: 'The full guide: mounting, context, live mode, serialization.' },
+      { href: `${base}/connectors/`, title: 'Connectors', body: 'Sources and targets: local files, Postgres, Qdrant, LanceDB, and more.' },
+      { href: `${base}/advanced_topics/`, title: 'Advanced topics', body: 'Memoization keys, custom connectors, live components, and more.' },
+    ],
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content={THEME_COLOR} />
+    <title>Grepify Docs</title>
+    <meta name="description" content="Grepify — a lightweight code index for any harness. Declare target states as a function of source data; the Rust engine keeps them in sync." />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={`${base}/img/favicon.ico`} />
+  </head>
+  <body>
+    <Topbar />
+
+    <div class="layout">
+      <Sidebar currentSlug="" />
+
+      <main class="content">
+        <article class="prose">
+          <h1>Grepify</h1>
+          <p class="lede">A lightweight code index for any harness.</p>
+          <p>
+            Grepify is a declarative, incremental data-transformation engine. You declare what your
+            derived output (an index, a table, a set of files) should look like as a function of your
+            source data; the Rust engine tracks changes and keeps the output in sync, reprocessing
+            only what changed.
+          </p>
+          <DocCardGrid groups={groups} />
+          <p>
+            Grepify is open source — browse the code, examples, and issue tracker on
+            <a href={GITHUB_REPO}>GitHub</a>.
+          </p>
+        </article>
+      </main>
+    </div>
+
+    <Foot />
+  </body>
+</html>

@@ -1,0 +1,14 @@
+[project]
+name = "entity_resolution_benchmark"
+version = "0.1.0"
+description = "Synthetic benchmark for Grepify entity resolution"
+requires-python = ">=3.11"
+dependencies = [
+    "grepify[entity_resolution_llm]",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+grepify = {path = "../../", editable = true}
